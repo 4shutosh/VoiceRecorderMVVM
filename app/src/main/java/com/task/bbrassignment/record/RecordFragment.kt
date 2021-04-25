@@ -28,6 +28,7 @@ class RecordFragment : Fragment(R.layout.fragment_record) {
         super.onViewCreated(view, savedInstanceState)
         recordBinding = FragmentRecordBinding.bind(view)
 
+        subscribe()
         recordBinding.recordButton.setOnClickListener {
             val bool = viewModel.validateName(recordBinding.audioNameEt.text.toString())
             try {
@@ -45,7 +46,6 @@ class RecordFragment : Fragment(R.layout.fragment_record) {
                 showProgress(true)
                 val text = recordBinding.audioNameEt.text.toString()
                 // start recording here and make the file name
-                subscribe()
                 viewModel.startRecording(text)
                 setText(text)
             } else {
