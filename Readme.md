@@ -23,3 +23,22 @@
 - No Services used, the app is intended to work well on the foreground only.
 
 - Some other Helpfull links : [ViewModels](https://developer.android.com/topic/libraries/architecture/viewmodel), [ViewBinding](https://developer.android.com/topic/libraries/view-binding)
+
+
+#### App Behaviour Explanation
+
+> Note: Please record at least 3-4 records to efficiently test the application
+
+- the first tab/screen is to record our voice from microphone, for which a name is required:
+    1. Enter Name
+    2. Press Record Button to start recording
+    3. Recording started, press stop Button to stop current recording
+    4. Your current recording is saved and will be visible in the list
+
+- the second screen/tab is the list of our recordings (App only)
+  - List of our recordings is visible (if ever recorded something)
+  - **Play Button** : plays when an item is clicked form the list, or if the shuffle is on and we click this button.
+  - **Next Button**: Plays next record(in sequence/random) depending on the shuffle state. This plays a record, but if loop is ON the new played record will loop
+  - **Previous Button**: Plays previous record(in sequence/random) depending on the shuffle state. This plays a record, but if loop is ON the new played record will loop. If a record is playing, it will restart the playing record.
+  - **Shuffle** : Enables random song playing
+  - **Loop** : Enables playing song to play again and again
