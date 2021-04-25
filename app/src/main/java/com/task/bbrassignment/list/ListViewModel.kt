@@ -152,7 +152,13 @@ class ListViewModel @ViewModelInject constructor(
 
     fun playAgain() {
         list.value?.let { recordList ->
-            playRecord(recordList[currentPosition].filePath, currentPosition)
+            if (recordList.isNotEmpty()) {
+                if (currentPosition != -1) {
+                    playRecord(recordList[currentPosition].filePath, currentPosition)
+                } else {
+                    playNext()
+                }
+            }
         }
     }
 
