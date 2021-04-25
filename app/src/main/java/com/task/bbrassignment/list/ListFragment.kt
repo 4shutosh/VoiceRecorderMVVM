@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -55,7 +56,29 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
                 adapter = recordAdapter
             }
             layoutPlayer.playPause.setOnClickListener {
-                playNext()
+                if (isLoopOn()) {
+                    // play again without click action
+                    playAgain()
+                } else {
+                    if (isShuffleOn()) {
+                        playNextRandom()
+                    } else {
+                        Toast.makeText(
+                            requireContext(),
+                            "No Track Selected/Shuffle OFF",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    listBinding.layoutPlayer.next.setOnClickListener {
+                        // check for shuffle here
+                        if (isShuffleOn()) {
+                            // play random
+                            playNextRandom()
+                        } else {
+                            playNext()
+                        }
+                    }
+                }
             }
         }
 
@@ -78,6 +101,11 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
                         viewModel.pauseRecord()
                         enableSeek(false)
                     }
+                    listBinding.layoutPlayer.previous.setOnClickListener {
+                        viewModel.playAgain()
+                        // pass true here as we go from Playing to playing again
+                        enableSeek(true)
+                    }
                 }
                 is RecordState.Pause -> {
                     // play
@@ -93,15 +121,40 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
                     changeButtonIcon(false)
                     listBinding.layoutPlayer.seek.progress = 0
 
-                    val boolLoop = listBinding.layoutPlayer.loop.isActivated
-                    if (boolLoop) {
+                    if (isLoopOn()) {
                         // play again without click action
                         playAgain()
                     } else {
+                        listBinding.layoutPlayer.playPause.setOnClickListener {
+                            if (isLoopOn()) {
+                                // play again without click action
+                                playAgain()
+                            } else {
+                                listBinding.layoutPlayer.next.setOnClickListener {
+                                    // check for shuffle here
+                                    if (isShuffleOn()) {
+                                        // play random
+                                        playNextRandom()
+                                    } else {
+                                        playNext()
+                                    }
+                                }
+                                listBinding.layoutPlayer.previous.setOnClickListener {
+                                    // check for shuffle here
+                                    if (isShuffleOn()) {
+                                        // play random
+                                        playNextRandom()
+                                    } else {
+                                        playNext()
+                                    }
+                                }
+                            }
+                        }
+                        // next should play, a record (random/or in sequence),
+                        // but if loop is ON the new played record will loop
                         listBinding.layoutPlayer.next.setOnClickListener {
                             // check for shuffle here
-                            val bool = listBinding.layoutPlayer.shuffle.isActivated
-                            if (bool) {
+                            if (isShuffleOn()) {
                                 // play random
                                 playNextRandom()
                             } else {
@@ -119,10 +172,11 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
             changeButtonIconLoop()
         }
 
+        // next should play, a record (random/or in sequence),
+        // but if loop is ON the new played record will loop
         listBinding.layoutPlayer.next.setOnClickListener {
             // check for shuffle here
-            val bool = listBinding.layoutPlayer.shuffle.isActivated
-            if (bool) {
+            if (isShuffleOn()) {
                 // play random
                 playNextRandom()
             } else {
@@ -130,7 +184,12 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
             }
         }
         listBinding.layoutPlayer.previous.setOnClickListener {
-            playPrevious()
+            if (isShuffleOn()) {
+                playNextRandom()
+            } else {
+                playPrevious()
+            }
+
         }
     }
 
@@ -139,12 +198,12 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
             Log.d("OnCLick", "onItemClick: " + it[position].title)
             val filePath = it[position].filePath
             lifecycleScope.launch {
-                play(filePath, position)
+                playWithFilePath(filePath, position)
             }
         }
     }
 
-    private fun play(filePath: String, position: Int) {
+    private fun playWithFilePath(filePath: String, position: Int) {
         viewModel.playRecord(filePath, position)
         listBinding.layoutPlayer.seek.max = viewModel.recordDuration
         enableSeek(true)
@@ -204,6 +263,9 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
     private fun changeButtonIconLoop() {
         listBinding.layoutPlayer.loop.isActivated = !listBinding.layoutPlayer.loop.isActivated
     }
+
+    private fun isShuffleOn(): Boolean = listBinding.layoutPlayer.shuffle.isActivated
+    private fun isLoopOn(): Boolean = listBinding.layoutPlayer.loop.isActivated
 }
 
 interface RecyclerViewOnClickListener {
