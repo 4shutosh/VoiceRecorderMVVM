@@ -22,6 +22,8 @@ import kotlinx.coroutines.launch
 /*other method can be to pass the title, and then ask for the filePath from the repository using getRecordByTitle
 * and in turn again using the  filePath to access the media file*/
 
+/*current loop has more priority than shuffle, here the loop is only one type i.e. loop current song*/
+
 @AndroidEntryPoint
 class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListener {
 
@@ -91,15 +93,41 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
                     changeButtonIcon(false)
                     listBinding.layoutPlayer.seek.progress = 0
 
-                    listBinding.layoutPlayer.playPause.setOnClickListener {
-                        playNext()
+                    val boolLoop = listBinding.layoutPlayer.loop.isActivated
+                    if (boolLoop) {
+                        // play again without click action
+                        playAgain()
+                    } else {
+                        listBinding.layoutPlayer.next.setOnClickListener {
+                            // check for shuffle here
+                            val bool = listBinding.layoutPlayer.shuffle.isActivated
+                            if (bool) {
+                                // play random
+                                playNextRandom()
+                            } else {
+                                playNext()
+                            }
+                        }
                     }
                 }
             }
         })
+        listBinding.layoutPlayer.shuffle.setOnClickListener {
+            changeButtonIconShuffle()
+        }
+        listBinding.layoutPlayer.loop.setOnClickListener {
+            changeButtonIconLoop()
+        }
 
         listBinding.layoutPlayer.next.setOnClickListener {
-            playNext()
+            // check for shuffle here
+            val bool = listBinding.layoutPlayer.shuffle.isActivated
+            if (bool) {
+                // play random
+                playNextRandom()
+            } else {
+                playNext()
+            }
         }
         listBinding.layoutPlayer.previous.setOnClickListener {
             playPrevious()
@@ -124,6 +152,18 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
 
     private fun playNext() {
         viewModel.playNext()
+        listBinding.layoutPlayer.seek.max = viewModel.recordDuration
+        enableSeek(true)
+    }
+
+    private fun playNextRandom() {
+        viewModel.playRandom()
+        listBinding.layoutPlayer.seek.max = viewModel.recordDuration
+        enableSeek(true)
+    }
+
+    private fun playAgain() {
+        viewModel.playAgain()
         listBinding.layoutPlayer.seek.max = viewModel.recordDuration
         enableSeek(true)
     }
@@ -155,6 +195,14 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
 
     private fun changeButtonIcon(bool: Boolean) {
         listBinding.layoutPlayer.playPause.isActivated = bool
+    }
+
+    private fun changeButtonIconShuffle() {
+        listBinding.layoutPlayer.shuffle.isActivated = !listBinding.layoutPlayer.shuffle.isActivated
+    }
+
+    private fun changeButtonIconLoop() {
+        listBinding.layoutPlayer.loop.isActivated = !listBinding.layoutPlayer.loop.isActivated
     }
 }
 

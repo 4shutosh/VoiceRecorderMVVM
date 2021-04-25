@@ -68,7 +68,7 @@ class ListViewModel @ViewModelInject constructor(
             e.printStackTrace()
 
         } catch (e: IOException) {
-             e.printStackTrace()
+            e.printStackTrace()
         }
     }
 
@@ -117,6 +117,16 @@ class ListViewModel @ViewModelInject constructor(
         }
     }
 
+    fun playRandom() {
+        list.value?.let { recordList ->
+            if (recordList.isNotEmpty()) {
+                val max = recordList.size - 1
+                val random = (0..max).random()
+                playRecord(recordList[random].filePath, random)
+            }
+        }
+    }
+
     fun playPrevious() {
         list.value?.let { listTemp ->
             if (listTemp.isNotEmpty()) {
@@ -137,6 +147,12 @@ class ListViewModel @ViewModelInject constructor(
                 }
 
             }
+        }
+    }
+
+    fun playAgain() {
+        list.value?.let { recordList ->
+            playRecord(recordList[currentPosition].filePath, currentPosition)
         }
     }
 
