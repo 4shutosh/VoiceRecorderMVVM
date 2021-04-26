@@ -3,14 +3,14 @@
         <shape android:shape="oval">
             <solid android:color="@color/cyan200" />
             <size
-                android:width="90dp"
-                android:height="90dp" />
+                android:width="70dp"
+                android:height="70dp" />
         </shape>
     </item>
     <item
-        android:width="60dp"
-        android:height="60dp"
+        android:width="45dp"
+        android:height="45dp"
         android:drawable="@drawable/ic_previous"
-        android:start="15dp"
-        android:top="15dp" />
+        android:start="13dp"
+        android:top="13dp" />
 </layer-list>
