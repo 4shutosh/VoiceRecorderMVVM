@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.task.bbrassignment.R
 import com.task.bbrassignment.adapter.RecordListAdapter
 import com.task.bbrassignment.databinding.ListFragmentBinding
@@ -34,6 +33,8 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
 
     private lateinit var mainHandler: Handler
 
+    private val TAG = "ListFragment"
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         listBinding = ListFragmentBinding.bind(view)
@@ -49,8 +50,7 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
         viewModel.initPlayer()
 
         listBinding.apply {
-            val layoutM = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, true)
-            layoutM.stackFromEnd = true
+            val layoutM = LinearLayoutManager(requireContext())
             recyclerView.apply {
                 layoutManager = layoutM
                 adapter = recordAdapter
@@ -71,12 +71,7 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
                     }
                     listBinding.layoutPlayer.next.setOnClickListener {
                         // check for shuffle here
-                        if (isShuffleOn()) {
-                            // play random
-                            playNextRandom()
-                        } else {
-                            playNext()
-                        }
+                        checkShuffleAndPlayNEXT()
                     }
                 }
             }
@@ -130,36 +125,18 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
                                 // play again without click action
                                 playAgain()
                             } else {
-                                listBinding.layoutPlayer.next.setOnClickListener {
-                                    // check for shuffle here
-                                    if (isShuffleOn()) {
-                                        // play random
-                                        playNextRandom()
-                                    } else {
-                                        playNext()
-                                    }
-                                }
-                                listBinding.layoutPlayer.previous.setOnClickListener {
-                                    // check for shuffle here
-                                    if (isShuffleOn()) {
-                                        // play random
-                                        playNextRandom()
-                                    } else {
-                                        playNext()
-                                    }
-                                }
+                                checkShuffleAndPlayNEXT()
                             }
                         }
                         // next should play, a record (random/or in sequence),
                         // but if loop is ON the new played record will loop
                         listBinding.layoutPlayer.next.setOnClickListener {
                             // check for shuffle here
-                            if (isShuffleOn()) {
-                                // play random
-                                playNextRandom()
-                            } else {
-                                playNext()
-                            }
+                            checkShuffleAndPlayNEXT()
+                        }
+                        listBinding.layoutPlayer.previous.setOnClickListener {
+                            // check for shuffle here
+                            checkShuffleAndPlayPrevious()
                         }
                     }
                 }
@@ -176,19 +153,10 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
         // but if loop is ON the new played record will loop
         listBinding.layoutPlayer.next.setOnClickListener {
             // check for shuffle here
-            if (isShuffleOn()) {
-                // play random
-                playNextRandom()
-            } else {
-                playNext()
-            }
+            checkShuffleAndPlayNEXT()
         }
         listBinding.layoutPlayer.previous.setOnClickListener {
-            if (isShuffleOn()) {
-                playNextRandom()
-            } else {
-                playPrevious()
-            }
+            checkShuffleAndPlayPrevious()
 
         }
     }
@@ -231,6 +199,23 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
         viewModel.playPrevious()
         listBinding.layoutPlayer.seek.max = viewModel.recordDuration
         enableSeek(true)
+    }
+
+    private fun checkShuffleAndPlayPrevious() {
+        if (isShuffleOn()) {
+            Log.d(TAG, "checkShuffleAndPlayPrevious: here")
+            playNextRandom()
+        } else {
+            playPrevious()
+        }
+    }
+
+    private fun checkShuffleAndPlayNEXT() {
+        if (isShuffleOn()) {
+            playNextRandom()
+        } else {
+            playNext()
+        }
     }
 
     private fun setRecordTitle() {
