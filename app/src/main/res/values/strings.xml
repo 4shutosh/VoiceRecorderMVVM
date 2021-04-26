@@ -9,4 +9,5 @@
     <string name="isRecording">Your voice is recording :</string>
     <string name="goToList">Please go the list screen to play your recording</string>
     <string name="done">Done</string>
+    <string name="voiceRecorder">Voice Recorder</string>
 </resources>
