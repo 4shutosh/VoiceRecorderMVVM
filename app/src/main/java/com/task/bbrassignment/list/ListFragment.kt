@@ -3,7 +3,6 @@ package com.task.bbrassignment.list
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -32,8 +31,6 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
     private val viewModel: ListViewModel by viewModels()
 
     private lateinit var mainHandler: Handler
-
-    private val TAG = "ListFragment"
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -163,7 +160,6 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
 
     override fun onItemClick(position: Int) {
         viewModel.list.value?.let {
-            Log.d("OnCLick", "onItemClick: " + it[position].title)
             val filePath = it[position].filePath
             lifecycleScope.launch {
                 playWithFilePath(filePath, position)
@@ -203,7 +199,6 @@ class ListFragment : Fragment(R.layout.list_fragment), RecyclerViewOnClickListen
 
     private fun checkShuffleAndPlayPrevious() {
         if (isShuffleOn()) {
-            Log.d(TAG, "checkShuffleAndPlayPrevious: here")
             playNextRandom()
         } else {
             playPrevious()
